@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz & Choice Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: url('/Users/admin/Documents/workspace/sp demo stem/pngtree-simple-solid-color-black-business-technology-sense-sphere-line-beautiful-background-image_67492.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameContainer {
+            width: 800px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #questionFrame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 40%;
+            border: 2px solid white;
+            background-color: rgba(0, 0, 0, 0.7); /* Làm khung đen mờ */
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #titleText {
+            font-size: 48px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            font-size: 36px;
+            margin: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .option:hover {
+            transform: scale(1.1);
+        }
+
+        .inputBox {
+            background-color: white;
+            color: #FFD700;
+            font-size: 24px;
+            width: 300px;
+            height: 50px;
+            margin: 10px auto;
+            padding: 10px;
+            border: 2px solid #000;
+            text-align: center;
+        }
+
+        #questionText {
+            font-size: 28px;
+            color: #FFD700;
+        }
+
+        .endingText {
+            font-size: 28px;
+            color: #FFD700;
+        }
+
+        #finalMessage {
+            font-size: 48px;
+            color: #1E90FF;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="titleText">Make Your Choice</div>
+        <div id="options">
+            <div class="option" onclick="chooseOption(1)">1. Use AI</div>
+            <div class="option" onclick="chooseOption(2)">2. Think for Yourself</div>
+        </div>
+        <div id="quizContainer" style="display: none;">
+            <div id="questionFrame">
+                <div id="questionText"></div>
+                <input 
+                    type="text" 
+                    id="answerInput" 
+                    class="inputBox" 
+                    placeholder="Type your answer" 
+                    oninput="handleInput(event)" 
+                    onkeydown="checkEnter(event)">
+            </div>
+        </div>
+        <div id="endingContainer" style="display: none;">
+            <div class="endingText" id="endingText"></div>
+            <div id="finalMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {question: "What is the longest river in the world?", answer: "Nile"},
+            {question: "Who invented the light bulb?", answer: "Thomas Edison"},
+            {question: "What element has the symbol O?", answer: "Oxygen"},
+            {question: "What is the capital of Japan?", answer: "Tokyo"},
+            {question: "What bird cannot fly?", answer: "Penguin"}
+        ];
+
+        let currentQuestionIndex = 0;
+        let chosen = null;
+        let userAnswer = "";
+
+        const ending1Parts = [
+            "You relied on AI to handle the task.",
+            "At first, everything seemed perfect.",
+            "The work was completed quickly and efficiently.",
+            "However, as time passed, your own skills began to fade.",
+            "Eventually, you became completely dependent on AI for everything.",
+            "One day, the AI failed, leaving you helpless and lost.",
+            "Is convenience worth losing your autonomy?"
+        ];
+
+        const ending2Parts = [
+            "You decided to think and work through the problem yourself.",
+            "It was challenging and took a lot of time.",
+            "There were moments when you doubted your abilities.",
+            "But with persistence, you started making progress.",
+            "Each small success built your confidence and skills.",
+            "Eventually, you completed the task on your own.",
+            "You realized the value of effort and personal growth."
+        ];
+
+        function chooseOption(option) {
+            chosen = option;
+            document.getElementById('options').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                document.getElementById('questionText').textContent = "Question " + (currentQuestionIndex + 1) + ": " + questions[currentQuestionIndex].question;
+                document.getElementById('answerInput').value = '';
+            } else {
+                showEnding();
+            }
+        }
+
+        function handleInput(event) {
+            userAnswer = event.target.value;
+        }
+
+        function checkEnter(event) {
+            if (event.key === "Enter") {
+                submitAnswer();
+            }
+        }
+
+        function submitAnswer() {
+            const correctAnswer = questions[currentQuestionIndex].answer;
+            const isCorrect = userAnswer.trim().toLowerCase() === correctAnswer.toLowerCase();
+            const nextIndex = currentQuestionIndex + 1;
+
+            if (nextIndex < questions.length) {
+                // Show next question immediately after answer
+                currentQuestionIndex++;
+                showQuestion();
+            } else {
+                // End the game and show ending
+                showEnding();
+            }
+
+            if (!isCorrect) {
+                alert("Wrong! The correct answer was: " + correctAnswer);
+            }
+        }
+
+        function showEnding() {
+            const endingParts = chosen === 1 ? ending1Parts : ending2Parts;
+            let i = 0;
+            const endingTextContainer = document.getElementById('endingText');
+            const finalMessageContainer = document.getElementById('finalMessage');
+
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('endingContainer').style.display = 'block';
+
+            const interval = setInterval(() => {
+                if (i < endingParts.length) {
+                    endingTextContainer.textContent = endingParts[i];
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    finalMessageContainer.textContent = "Thanks For Using";
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
